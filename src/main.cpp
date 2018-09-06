@@ -244,7 +244,7 @@ int main() {
 
           	json msgJson;
 						
-			int npts_old = previous_path_x.size();
+			int prev_npts = previous_path_x.size();
 			
 			vector<double> ptsx;
           	vector<double> ptsy;
@@ -253,11 +253,9 @@ int main() {
 			double ref_y = car_y;
 			double ref_yaw = deg2grad(car_yaw);
 			
-          	
+			//double dd = 0.5; // about 50 mph
 			
-			double dd = 0.5; // about 50 mph
-			
-			if (npts_old<2)
+			if (prev_npts<2)
 			{
 			    // if not enough previous pts, ad at least 1
 				double prev_x = car_x-cos(car_yaw);
@@ -271,11 +269,11 @@ int main() {
 			} 
 			else 
 			{
-				ref_x = previous_path_x[npts_old-1];
-				ref_y = previous_path_y[npts_old-1];
+				ref_x = previous_path_x[prev_npts-1];
+				ref_y = previous_path_y[prev_npts-1];
 				
-				prev_x = previous_path_x[npts_old-2];
-				prev_y = previous_path_y[npts_old-2];
+				prev_x = previous_path_x[prev_npts-2];
+				prev_y = previous_path_y[prev_npts-2];
 				
 				ref_yaw = atan2(ref_y-prev_y,ref_x-prev_x);
 				
@@ -319,7 +317,7 @@ int main() {
 			vector<double> next_x_vals;
           	vector<double> next_y_vals;
 			
-			for(int i=0;i< npts_old;i++)
+			for(int i=0;i< prev_npts;i++)
 			{
 				next_x_vals.push_back(previous_path_x[i]);
 				next_y_vals.push_back(previous_path_y[i]);
