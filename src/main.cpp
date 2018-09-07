@@ -203,7 +203,7 @@ int main() {
 
   int lane = 1; //0,1,2
   int lane_width =4; // meters
-  double vref = 49.5; // mph
+  double vref = 0; // mph, initialization
   
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
@@ -245,6 +245,50 @@ int main() {
           	json msgJson;
 						
 			int prev_npts = previous_path_x.size();
+			
+			// avoid collision
+			
+			if(prev_npts>0)
+			{
+				car_s=end_path_s;
+			}
+			
+			bool too_close = false;
+			
+			for(int i=0;i<sension_fusion[i][6])
+			{
+				float d = sension_fusion[i][3];
+				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
+				{
+					double vx = sensor_fusion[i][3];
+					double vy = sensor_fusion[i][4];
+					double check_speed = sqrt(vx*vx+vy*vy);
+					double check_car_s = sensor_fusion[i][5];
+					
+					check_car_s += ((double)prev_npts*.02*check_speed);
+					if((check_car_s-car_s)>0 && (check_car_s-car_s)<30)
+					{
+						too_close = true;
+						if(lane>0)
+						{
+							lane=0; //cambiare, guardare altre corsie
+						}
+					}
+				}
+			}
+			
+			if(too_close)
+			{
+				vref-=.224;
+			}
+			else if(vref<49.5)
+			{
+				vref+=.224;
+			}
+			
+			
+			
+			
 			
 			vector<double> ptsx;
           	vector<double> ptsy;
@@ -321,12 +365,34 @@ int main() {
 			{
 				next_x_vals.push_back(previous_path_x[i]);
 				next_y_vals.push_back(previous_path_y[i]);
-				
-				double target_x = 30;
-				
-				// minuto 30 e 14 sec
-			}
+			}	
 			
+			double target_x = 30;
+			double target_y = s(target_x);
+			double target_dist = sqrt(target_x*target_x+target_y*target_y);
+			
+			double x_add_on = 0;
+						
+			for(int i=1;i<=50-prev_npts;i++)
+			{
+				double N = (target_dist/(0.02*vref/2.24));
+				double x_point = x_add_on+target_x/N;
+				double y_point = s(x_point)
+				
+				x_add_on = x_point;
+				
+				double x_ref = x_point;
+				double y_ref = y_point;
+				
+				x_point = (x_ref*cos(ref_yaw)-y_ref*sin(ref_yaw))
+				y_point = (x_ref*sin(ref_yaw)+y_ref*sin(ref_yaw))
+				
+				x_point+=ref_x;
+				y_point+=ref_y;
+				
+				next_x_vals.push_back(x_point);
+				next_y_vals.push_back(y_point);
+			}
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
           	msgJson["next_x"] = next_x_vals;
           	msgJson["next_y"] = next_y_vals;
