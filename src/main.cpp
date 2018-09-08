@@ -288,9 +288,6 @@ int main() {
 			}
 			
 			
-			
-			
-			
 			vector<double> ptsx;
           	vector<double> ptsy;
 			
@@ -298,7 +295,6 @@ int main() {
 			double ref_y = car_y;
 			double ref_yaw = deg2rad(car_yaw);
 			
-			//double dd = 0.5; // about 50 mph
 			
 			if (prev_npts<2)
 			{
@@ -330,9 +326,9 @@ int main() {
 				
 			}
 			
-			vector<double> wp0 = getXY(car_s+30, (lane+1)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp1 = getXY(car_s+60, (lane+1)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp2 = getXY(car_s+90, (lane+1)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp0 = getXY(car_s+30, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp1 = getXY(car_s+60, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp2 = getXY(car_s+90, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 		
 			ptsx.push_back(wp0[0]);
 			ptsx.push_back(wp1[0]);
