@@ -348,8 +348,8 @@ int main() {
 				double shift_x = ptsx[i]-ref_x;
 				double shift_y = ptsy[i]-ref_y;
 				
-				ptsx[i]=(shift_x*cos(-ref_yaw)-shift_y*sin(-ref_yaw))
-				ptsy[i]=(shift_x*sin(-ref_yaw)+shift_y*cos(-ref_yaw))
+				ptsx[i]=(shift_x*cos(-ref_yaw)-shift_y*sin(-ref_yaw));
+				ptsy[i]=(shift_x*sin(-ref_yaw)+shift_y*cos(-ref_yaw));
 				
 				next_x_vals.push_back(xy[0]);
 				next_x_vals.push_back(xy[1]);
@@ -385,8 +385,8 @@ int main() {
 				double x_ref = x_point;
 				double y_ref = y_point;
 				
-				x_point = (x_ref*cos(ref_yaw)-y_ref*sin(ref_yaw))
-				y_point = (x_ref*sin(ref_yaw)+y_ref*sin(ref_yaw))
+				x_point = (x_ref*cos(ref_yaw)-y_ref*sin(ref_yaw));
+				y_point = (x_ref*sin(ref_yaw)+y_ref*sin(ref_yaw));
 				
 				x_point+=ref_x;
 				y_point+=ref_y;
