@@ -201,6 +201,9 @@ int main() {
   	map_waypoints_dy.push_back(d_y);
   }
 
+  int lane = 1; //0,1,2
+  double lane_width =4.; // meters
+  double vref = 0.; // mph, initialization
   
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
@@ -243,9 +246,6 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			int lane = 1; //0,1,2
-			int lane_width =4; // meters
-			double vref = 0; // mph, initialization
 			
 			// avoid collision
 			
