@@ -256,9 +256,9 @@ int main() {
 			
 			bool too_close = false;
 			
-			for(int i=0;i<sensor_fusion[i][6];i++)
+			for(int i=0;i<sensor_fusion.size();i++)
 			{
-				float d = sensor_fusion[i][3];
+				float d = sensor_fusion[i][6];
 				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
 				{
 					double vx = sensor_fusion[i][3];
