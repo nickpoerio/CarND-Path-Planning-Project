@@ -380,7 +380,7 @@ int main() {
 				double y_ref = y_point;
 				
 				x_point = (x_ref*cos(ref_yaw)-y_ref*sin(ref_yaw));
-				y_point = (x_ref*sin(ref_yaw)+y_ref*sin(ref_yaw));
+				y_point = (x_ref*sin(ref_yaw)+y_ref*cos(ref_yaw));
 				
 				x_point+=ref_x;
 				y_point+=ref_y;
