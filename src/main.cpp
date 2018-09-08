@@ -201,9 +201,6 @@ int main() {
   	map_waypoints_dy.push_back(d_y);
   }
 
-  int lane = 1; //0,1,2
-  int lane_width =4; // meters
-  double vref = 0; // mph, initialization
   
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
@@ -246,6 +243,10 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
+			int lane = 1; //0,1,2
+			int lane_width =4; // meters
+			double vref = 0; // mph, initialization
+			
 			// avoid collision
 			
 			if(prev_npts>0)
@@ -255,9 +256,9 @@ int main() {
 			
 			bool too_close = false;
 			
-			for(int i=0;i<sension_fusion[i][6])
+			for(int i=0;i<sensor_fusion[i][6];i++)
 			{
-				float d = sension_fusion[i][3];
+				float d = sensor_fusion[i][3];
 				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
 				{
 					double vx = sensor_fusion[i][3];
@@ -295,7 +296,7 @@ int main() {
 			
 			double ref_x = car_x;
 			double ref_y = car_y;
-			double ref_yaw = deg2grad(car_yaw);
+			double ref_yaw = deg2rad(car_yaw);
 			
 			//double dd = 0.5; // about 50 mph
 			
@@ -316,8 +317,8 @@ int main() {
 				ref_x = previous_path_x[prev_npts-1];
 				ref_y = previous_path_y[prev_npts-1];
 				
-				prev_x = previous_path_x[prev_npts-2];
-				prev_y = previous_path_y[prev_npts-2];
+				double prev_x = previous_path_x[prev_npts-2];
+				double prev_y = previous_path_y[prev_npts-2];
 				
 				ref_yaw = atan2(ref_y-prev_y,ref_x-prev_x);
 				
@@ -377,7 +378,7 @@ int main() {
 			{
 				double N = (target_dist/(0.02*vref/2.24));
 				double x_point = x_add_on+target_x/N;
-				double y_point = s(x_point)
+				double y_point = s(x_point);
 				
 				x_add_on = x_point;
 				
