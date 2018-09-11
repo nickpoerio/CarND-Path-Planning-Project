@@ -246,6 +246,8 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
+			double react_time = 1.0;
+			double min_distance = car_speed*react_time; //1 second of reaction time
 			
 			// avoid collision
 			
@@ -266,8 +268,8 @@ int main() {
 					double check_speed = sqrt(vx*vx+vy*vy);
 					double check_car_s = sensor_fusion[i][5];
 					
-					check_car_s += ((double)prev_npts*.02*check_speed);
-					if(((check_car_s-car_s)>0) && ((check_car_s-car_s)<30))
+					check_car_s += ((double)prev_npts*.02*check_speed+(car_speed-check_speed)*react_time);
+					if(((check_car_s-car_s)>0) && ((check_car_s-car_s)<min_distance));
 					{
 						too_close = true;
 						if(lane>0)
@@ -326,9 +328,9 @@ int main() {
 				
 			}
 			
-			vector<double> wp0 = getXY(car_s+30, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp1 = getXY(car_s+60, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp2 = getXY(car_s+90, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp0 = getXY(car_s+min_distance, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp1 = getXY(car_s+min_distance*2, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp2 = getXY(car_s+min_distance*3, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 		
 			ptsx.push_back(wp0[0]);
 			ptsx.push_back(wp1[0]);
