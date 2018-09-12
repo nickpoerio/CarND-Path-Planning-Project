@@ -5,10 +5,12 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <algorithm>
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 #include "json.hpp"
 #include "spline.h"
+
 
 using namespace std;
 
@@ -247,40 +249,60 @@ int main() {
 			int prev_npts = previous_path_x.size();
 			
 			double react_time = 1.0;
-			double min_distance = car_speed*react_time; //1 second of reaction time
+			double min_distance = fmin(5,car_speed*react_time); //1 second of reaction time
 			
-			// avoid collision
+			vector<double> cost{0.,0.,0.};
 			
 			if(prev_npts>0)
 			{
 				car_s=end_path_s;
 			}
 			
-			bool too_close = false;
-			
 			for(int i=0;i<sensor_fusion.size();i++)
 			{
 				float d = sensor_fusion[i][6];
-				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
-				{
-					double vx = sensor_fusion[i][3];
-					double vy = sensor_fusion[i][4];
-					double check_speed = sqrt(vx*vx+vy*vy);
-					double check_car_s = sensor_fusion[i][5];
+				
+				double vx = sensor_fusion[i][3];
+				double vy = sensor_fusion[i][4];
+				double check_speed = sqrt(vx*vx+vy*vy);
+				double check_car_s = sensor_fusion[i][5];
 					
-					check_car_s += ((double)prev_npts*.02*check_speed+(car_speed-check_speed)*react_time);
-					if(((check_car_s-car_s)>0) && ((check_car_s-car_s)<min_distance));
+				check_car_s += ((double)prev_npts*.02*check_speed+(car_speed-check_speed)*react_time);
+				estim_dist = check_car_s-car_s;
+				double cost_tmp = fmax(0,1-(estim_dist)/min_distance);
+			
+				if(((estim_dist)>0) && ((estim_dist)<min_distance))
+				{
+					if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
 					{
-						too_close = true;
-						if(lane>0)
-						{
-							lane=0; //cambiare, guardare altre corsie
-						}
+						cost[lane]=cost_tmp;
+					}
+					else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0)
+					{
+						cost[lane-1]=cost_tmp;
+					}
+					else if(d<(lane_width*(lane+2)) && d>(lane_width*(lane+1) && lane<2)
+					{
+						cost[lane+1]=cost_tmp;
 					}
 				}
 			}
 			
-			if(too_close)
+			// excluding too far lane
+			if(lane==0)
+			{
+				cost[2]=1.;
+			}
+			else if(lane==2)
+			{
+				cost[0]=1.;
+			}
+			
+			// choosing lane
+			lane = std::distance(cost.begin(),std::min_element( cost.begin(), cost.end() ));
+		
+			// deciding longitudinal action
+			if(cost[lane]>0)
 			{
 				vref-=.224;
 			}
