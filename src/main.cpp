@@ -207,10 +207,8 @@ int main() {
   double lane_width =4.; // meters
   double vref = 0.; // mph, initialization
   double acc = 0.; // mph/s, initialization
-  double maxacc = 0.3; // mph/s
-  double accstep = 0.05; // mph/s
   
-  h.onMessage([&lane,&lane_width,&vref,&acc,&maxacc,&accstep,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&lane,&lane_width,&vref,&acc,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -305,21 +303,9 @@ int main() {
 			lane = std::distance(cost.begin(),std::min_element( cost.begin(), cost.end() ));
 		
 			// deciding longitudinal action
-			if(cost[lane]>0)
-			{
-				if(acc>-maxacc)
-				{
-					acc-=accstep;
-				}
-			}
-			else if(vref<49.5)
-			{
-				if(acc<maxacc)
-				{
-					acc+=accstep;
-				}
-			}
 			
+			acc=fmax(.3,fmin(-.3,sqrt(fmax(0,(49.-vref)))/20-cost-fmax(0,(vref-49))/10));
+						
 			vref+=acc;
 			
 			
