@@ -210,7 +210,7 @@ int main() {
   double maxacc = 0.3; // mph/s
   double accstep = 0.05; // mph/s
   
-  h.onMessage([&lane,&lane_width,&vref,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&lane,&lane_width,&vref,&acc,&maxacc,&accstep,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -271,7 +271,7 @@ int main() {
 				double check_car_s = sensor_fusion[i][5];
 					
 				check_car_s += ((double)prev_npts*.02*check_speed+(car_speed-check_speed)*react_time);
-				estim_dist = check_car_s-car_s;
+				double estim_dist = check_car_s-car_s;
 				double cost_tmp = fmax(0,1-(estim_dist)/min_distance);
 			
 				if(((estim_dist)>0) && ((estim_dist)<min_distance))
