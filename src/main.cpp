@@ -304,7 +304,7 @@ int main() {
 		
 			// deciding longitudinal action
 			
-			acc=fmax(.3,fmin(-.3,sqrt(fmax(0,(49.-vref)))/20-cost-fmax(0,(vref-49))/10));
+			acc=fmin(.3,fmax(-.3,sqrt(fmax(0,(49.-vref)))/20-cost-fmax(0,(vref-49))/10));
 						
 			vref+=acc;
 			
