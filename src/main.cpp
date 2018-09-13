@@ -250,7 +250,7 @@ int main() {
 			int prev_npts = previous_path_x.size();
 			
 			double react_time = 1.0;
-			double min_distance = fmax(20,car_speed*react_time); //1 second of reaction time
+			double min_distance = fmax(10,car_speed*.447*react_time); //1 second of reaction time
 			
 			vector<double> cost{0.,0.,0.};
 			
@@ -304,7 +304,7 @@ int main() {
 		
 			// deciding longitudinal action
 			
-			acc=fmin(.3,fmax(-.3,sqrt(fmax(0,(49.-vref)))/20-cost[lane]-fmax(0,(vref-49))/10));
+			acc=fmin(.224,fmax(-.224,sqrt(fmax(0,(49.-vref)))/20-cost[lane]-fmax(0,(vref-49))/10));
 						
 			vref+=acc;
 			
