@@ -252,7 +252,7 @@ int main() {
 			int prev_npts = previous_path_x.size();
 			
 			double react_time = 1.0;
-			double min_distance = fmin(5,car_speed*react_time); //1 second of reaction time
+			double min_distance = fmax(5,car_speed*react_time); //1 second of reaction time
 			
 			vector<double> cost{0.,0.,0.};
 			
@@ -270,7 +270,7 @@ int main() {
 				double check_speed = sqrt(vx*vx+vy*vy);
 				double check_car_s = sensor_fusion[i][5];
 					
-				check_car_s += ((double)prev_npts*.02*check_speed);//+(car_speed-check_speed)*react_time);
+				check_car_s += ((double)prev_npts*.02*check_speed)+(car_speed-check_speed)*react_time);
 				double estim_dist = check_car_s-car_s;
 				double cost_tmp = fmax(0,1-(estim_dist)/min_distance);
 			
