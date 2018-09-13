@@ -347,9 +347,9 @@ int main() {
 				
 			}
 			
-			vector<double> wp0 = getXY(car_s+min_distance/2, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp1 = getXY(car_s+min_distance, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp2 = getXY(car_s+min_distance*3/2, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp0 = getXY(car_s+min_distance, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp1 = getXY(car_s+min_distance*2, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp2 = getXY(car_s+min_distance*3, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 		
 			ptsx.push_back(wp0[0]);
 			ptsx.push_back(wp1[0]);
