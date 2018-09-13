@@ -206,6 +206,9 @@ int main() {
   int lane = 1; //0,1,2
   double lane_width =4.; // meters
   double vref = 0.; // mph, initialization
+  double acc = 0.; // mph/s, initialization
+  double maxacc = 0.3; // mph/s
+  double accstep = 0.05; // mph/s
   
   h.onMessage([&lane,&lane_width,&vref,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
@@ -304,12 +307,20 @@ int main() {
 			// deciding longitudinal action
 			if(cost[lane]>0)
 			{
-				vref-=.224;
+				if(acc>-maxacc)
+				{
+					acc-=accstep;
+				}
 			}
 			else if(vref<49.5)
 			{
-				vref+=.224;
+				if(acc<maxacc)
+				{
+					acc+=accstep;
+				}
 			}
+			
+			vref+=acc;
 			
 			
 			vector<double> ptsx;
