@@ -250,7 +250,7 @@ int main() {
 			int prev_npts = previous_path_x.size();
 			
 			double react_time = 1.0;
-			double min_distance = fmax(5,car_speed*react_time); //1 second of reaction time
+			double min_distance = fmax(5,car_speed*.447*react_time); //1 second of reaction time
 			
 			vector<double> cost{0.,0.,0.};
 			
