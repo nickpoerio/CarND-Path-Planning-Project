@@ -268,7 +268,7 @@ int main() {
 				double check_speed = sqrt(vx*vx+vy*vy);
 				double check_car_s = sensor_fusion[i][5];
 					
-				check_car_s += ((double)prev_npts*.02*check_speed+(car_speed-check_speed)*react_time);
+				check_car_s += ((double)prev_npts*.02*check_speed);//(car_speed-check_speed)*react_time);
 				double estim_dist = check_car_s-car_s;
 				double cost_tmp = fmax(0,1-(estim_dist)/min_distance)-fmin(0,fmax(-1,estim_dist/min_distance))/5;
 			
@@ -280,11 +280,11 @@ int main() {
 					}
 					else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0))
 					{
-						cost[lane-1]=cost_tmp;
+						cost[lane-1]=cost_tmp+.01;
 					}
 					else if(d<(lane_width*(lane+2)) && d>(lane_width*(lane+1) && lane<2))
 					{
-						cost[lane+1]=cost_tmp;
+						cost[lane+1]=cost_tmp+.01;
 					}
 				}
 			}
