@@ -250,7 +250,7 @@ int main() {
 			int prev_npts = previous_path_x.size();
 			
 			double react_time = 1.2;
-			double min_distance = fmax(5,car_speed*.447*react_time); //1 second of reaction time
+			double min_distance = fmax(10,car_speed*.447*react_time); //1 second of reaction time
 			
 			vector<double> cost{0.,0.,0.};
 			
@@ -270,7 +270,7 @@ int main() {
 					
 				check_car_s += ((double)prev_npts*.02*check_speed);
 				double estim_dist = check_car_s-car_s;
-				double cost_tmp = fmax(0,1-(estim_dist)/min_distance)-fmin(0,fmax(-1,estim_dist/min_distance))/10;
+				double cost_tmp = fmax(0,1-(estim_dist)/min_distance)+pow(abs(fmin(0,fmax(-1,estim_dist/min_distance))),.3)/3;
 			
 				if(((estim_dist)>0) && ((estim_dist)<min_distance))
 				{
