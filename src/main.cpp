@@ -268,9 +268,9 @@ int main() {
 				double check_speed = sqrt(vx*vx+vy*vy);
 				double check_car_s = sensor_fusion[i][5];
 					
-				check_car_s += ((double)prev_npts*.02*check_speed);//+(car_speed-check_speed)*react_time);
+				check_car_s += ((double)prev_npts*.02*check_speed+(car_speed-check_speed)*react_time);
 				double estim_dist = check_car_s-car_s;
-				double cost_tmp = fmax(0,1-(estim_dist)/min_distance);
+				double cost_tmp = fmax(0,1-(estim_dist)/min_distance)-fmin(0,fmax(-1,estim_dist/min_distance))/5;
 			
 				if(((estim_dist)>0) && ((estim_dist)<min_distance))
 				{
