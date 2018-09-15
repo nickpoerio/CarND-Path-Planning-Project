@@ -209,8 +209,9 @@ int main() {
   double acc = 0.; // mph/s, initialization
   double max_acc=.224; //mph/s
   double max_speed=49; //mph
+  double react_time = 0.8; //s
   
-  h.onMessage([&lane,&lane_width,&vref,&acc,&max_acc,&max_speed,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&lane,&lane_width,&vref,&acc,&max_acc,&max_speed,&react_time,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -251,11 +252,8 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double react_time = 0.8;
-			double min_distance = 10+car_speed*.447*react_time; //minimum+reaction space+stopping distance
 			double maneuver_distance=10+car_speed*.447;
 			
-			vector<double> cost_speed{0.,0.,0.};
 			vector<double> cost_traj{0.,0.,0.};
 			
 			if(prev_npts>0)
@@ -273,30 +271,44 @@ int main() {
 				double check_car_s = sensor_fusion[i][5];
 					
 				check_car_s += ((double)prev_npts*.02*check_speed);
-				double estim_dist = fmax(0,check_car_s-car_s);
-				double estim_dist_rear = -fmin(0,check_car_s-car_s);
-				double min_distance_rear = 15+check_speed*.447*react_time; // separare contributi front e rear, rear solo per cambio corsia
+				double dist=check_car_s-car_s;
+				double delta_speed = check_speed-car_speed;
+				double braking_dist = (pow(car_speed,2)-pow(check_speed,2))/max_acc;
 				
-				double cost_speed_tmp = 1
-				if(estim_dist>0)
+				double cost_dist_tmp = 0;
+				double cost_speed_tmp = 0;
+				double max_speed_tmp = max_speed;
+				
+				if(dist>0)
 				{
-					cost_speed_tmp=fmax(check_speed-car_speed)
+					double min_dist_front = 10+car_speed*.447*react_time+fmax(0,braking_dist); //minimum+reaction space+braking distance
+					cost_disp_tmp = fmax(0,1-dist/min_dist_front);
+					if(dist<min_dist_front)
+					{
+						cost_speed_tmp = fmax(0,1-check_speed/max_speed);  //penalizing speed<max_speed
+						max_speed_tmp = check_speed;
+					}
 				}
+				else
+				{
+					double min_dist_rear = 10+check_speed*.447*react_time+fmax(0,-braking_dist); 
+					cost_disp_tmp=fmax(0,1+dist/min_dist_rear);
+				}
+				
+				double cost_tmp=fmax(cost_disp_tmp,cost_speed_tmp);
+			
 			
 				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
 				{
-					cost[lane]=fmax(cost[lane],cost_tmp);
-					cost_traj[lane]=cost[lane];
+					cost_traj[lane]=fmax(cost_traj[lane],cost_tmp);
 				}
 				else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0))
 				{
-					cost[lane-1]=fmax(cost[lane-1],cost_tmp);
-					cost_traj[lane-1]=fmax(cost[lane-1],cost_tmp_rear)+.05;
+					cost_traj[lane-1]=fmax(0.05,fmax(cost_traj[lane-1],cost_tmp));
 				}
 				else if(d<(lane_width*(lane+2)) && d>(lane_width*(lane+1) && lane<2))
 				{
-					cost[lane+1]=fmax(cost[lane+1],cost_tmp);;
-					cost_traj[lane+1]=fmax(cost[lane+1],cost_tmp_rear)+.05;
+					cost_traj[lane+1]=fmax(0.05,fmax(cost_traj[lane+1],cost_tmp));
 				}
 			}
 			
@@ -315,7 +327,18 @@ int main() {
 		
 			// deciding longitudinal action
 			
-			acc=fmin(max_acc,fmax(-max_acc,fmax(0,(max_speed-vref))/max_speed*max_acc-cost[lane]*max_acc*2-fmax(0,(vref-max_speed))*max_acc));  //non-linear function of cost and speed
+			double cost_acc = 0;
+			
+			if(dist>0 && dist< min_dist_front)
+			{
+				double cost_acc = fmax(-1,fmin(0,max_speed_tmp-vref));
+			}
+			else if(dist<=0 && dist>min_dist_rear)
+			{
+				double cost_acc = fmax(0,1-vref/max_speed_tmp);
+			}
+			
+			acc=cost_acc*max_acc;  
 						
 			vref+=acc;
 			
