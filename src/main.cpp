@@ -274,10 +274,10 @@ int main() {
 					
 				check_car_s += ((double)prev_npts*.02*check_speed);
 				double estim_dist = fmax(0,check_car_s-car_s);
-				double estim_dist_rear = fmin(0,check_car_s-car_s);
+				double estim_dist_rear = -fmin(0,check_car_s-car_s);
 				double min_distance_rear = 15+check_speed*.447*react_time; // separare contributi front e rear, rear solo per cambio corsia
 				double cost_tmp = fmax(0,1-(estim_dist)/min_distance);
-				double cost_tmp_rear = fmax(0,-1+(estim_dist_rear)/min_distance_rear);
+				double cost_tmp_rear = fmax(0,1-(estim_dist_rear)/min_distance_rear);
 			
 				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
 				{
