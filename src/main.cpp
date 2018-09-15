@@ -207,8 +207,10 @@ int main() {
   double lane_width =4.; // meters
   double vref = 0.; // mph, initialization
   double acc = 0.; // mph/s, initialization
+  double max_acc=.224; //mph/s
+  double max_speed=49; //mph
   
-  h.onMessage([&lane,&lane_width,&vref,&acc,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&lane,&lane_width,&vref,&acc,&max_acc,&max_speed,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -249,10 +251,12 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double react_time = 1.2;
-			double min_distance = fmax(10,car_speed*.447*react_time); //1 second of reaction time
+			double react_time = 0.5;
+			double min_distance = 10+car_speed*.447*react_time+pow(car_speed*.447/30,2)*40); //minimum+reaction space+stopping distance
+			double maneuver_distance=10+car_speed*.447;
 			
 			vector<double> cost{0.,0.,0.};
+			vector<double> cost_traj{0.,0.,0.};
 			
 			if(prev_npts>0)
 			{
@@ -269,42 +273,45 @@ int main() {
 				double check_car_s = sensor_fusion[i][5];
 					
 				check_car_s += ((double)prev_npts*.02*check_speed);
-				double estim_dist = abs(check_car_s-car_s);
+				double estim_dist = fmax(0,check_car_s-car_s);
+				double estim_dist_rear = fmin(0,check_car_s-car_s);
+				double min_distance_rear = 15+check_speed*.447*react_time; // separare contributi front e rear, rear solo per cambio corsia
 				double cost_tmp = pow(fmax(0,1-(estim_dist)/min_distance),2);
+				double cost_tmp_rear = pow(fmax(0,-1+(estim_dist_rear)/min_distance_rear),2);
 			
-				if(estim_dist<min_distance)
+				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
 				{
-					if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
-					{
-						cost[lane]=cost_tmp;
-					}
-					else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0))
-					{
-						cost[lane-1]=cost_tmp+.01;
-					}
-					else if(d<(lane_width*(lane+2)) && d>(lane_width*(lane+1) && lane<2))
-					{
-						cost[lane+1]=cost_tmp+.01;
-					}
+					cost[lane]=cost_tmp;
+					cost_traj[lane]=cost_tmp;
+				}
+				else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0))
+				{
+					cost[lane]=cost_tmp;
+					cost_traj[lane-1]=fmax(cost_tmp,cost_tmp_rear)+.05;
+				}
+				else if(d<(lane_width*(lane+2)) && d>(lane_width*(lane+1) && lane<2))
+				{
+					cost[lane]=cost_tmp;
+					cost_traj[lane+1]=fmax(cost_tmp,cost_tmp_rear)+.05;
 				}
 			}
 			
 			// excluding too far lane
 			if(lane==0)
 			{
-				cost[2]=1.;
+				cost_traj[2]=1.;
 			}
 			else if(lane==2)
 			{
-				cost[0]=1.;
+				cost_traj[0]=1.;
 			}
 			
 			// choosing lane
-			lane = std::distance(cost.begin(),std::min_element( cost.begin(), cost.end() ));
+			lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
 		
 			// deciding longitudinal action
 			
-			acc=fmin(.224,fmax(-.224,sqrt(fmax(0,(49.-vref)))/20-cost[lane]-fmax(0,(vref-49))/10));
+			acc=fmin(max_acc,fmax(-max_acc,sqrt(fmax(0,(max_speed-vref)))/20-cost[lane]-fmax(0,(vref-max_speed))*max_acc));  //non-linear function of cost and speed
 						
 			vref+=acc;
 			
@@ -347,9 +354,9 @@ int main() {
 				
 			}
 			
-			vector<double> wp0 = getXY(car_s+min_distance*1.5, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp1 = getXY(car_s+min_distance*2*1.5, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp2 = getXY(car_s+min_distance*3*1.5, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp0 = getXY(car_s+maneuver_distance, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp1 = getXY(car_s+maneuver_distance*2, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp2 = getXY(car_s+maneuver_distance*3, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 		
 			ptsx.push_back(wp0[0]);
 			ptsx.push_back(wp1[0]);
