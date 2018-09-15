@@ -331,15 +331,8 @@ int main() {
 				
 				// long. acceleration cost
 			
-			
-				if(dist>0 && dist< min_dist_front)
-				{
-					double cost_acc = fmax(-1,fmin(0,max_speed_tmp-vref));
-				}
-				else if(dist<=0 && dist>min_dist_rear)
-				{
-					double cost_acc = fmax(0,1-vref/max_speed_tmp);
-				}
+				double cost_acc = fmax(-1,fmin(0,max_speed_new-vref))+fmax(0,1-vref/max_speed_new);
+	
 			}
 			
 			// excluding too far lane
