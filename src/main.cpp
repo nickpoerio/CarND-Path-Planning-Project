@@ -282,7 +282,7 @@ int main() {
 				if(dist>0)
 				{
 					double min_dist_front = 10+car_speed*.447*react_time+fmax(0,braking_dist); //minimum+reaction space+braking distance
-					cost_disp_tmp = fmax(0,1-dist/min_dist_front);
+					cost_dist_tmp = fmax(0,1-dist/min_dist_front);
 					if(dist<min_dist_front)
 					{
 						cost_speed_tmp = fmax(0,1-check_speed/max_speed);  //penalizing speed<max_speed
