@@ -209,7 +209,7 @@ int main() {
   double acc = 0.; // mph/s, initialization
   double max_acc=.224; //mph/s
   double max_speed=49; //mph
-  double react_time = 0.8; //s
+  double react_time = 0.5; //s
   
   h.onMessage([&lane,&lane_width,&vref,&acc,&max_acc,&max_speed,&react_time,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
@@ -275,16 +275,17 @@ int main() {
 				check_car_s += ((double)prev_npts*.02*check_speed);
 				double dist=check_car_s-car_s;
 				double delta_speed = check_speed-car_speed;
-				double braking_dist = (pow(car_speed*.447,2)-pow(check_speed*.447,2))/(2*.5);
+				double braking_dist = (pow(car_speed*.447,2)-pow(check_speed*.447,2))/(2*5);
 				
-				double cost_dist_tmp = 0;
+				double cost_dist_front_tmp = 0;
+				double cost_dist_rear_tmp = 0;
 				double cost_speed_tmp = 0;
 				double max_speed_tmp = max_speed;
 				
 				if(dist>0)
 				{
 					double min_dist_front = 10+car_speed*.447*react_time+fmax(0,braking_dist); //minimum+reaction space+braking distance
-					cost_dist_tmp = fmax(0,1-dist/min_dist_front);
+					cost_dist_front_tmp = fmax(0,1-dist/min_dist_front);
 					if(dist<min_dist_front)
 					{
 						cost_speed_tmp = fmax(0,1-check_speed/max_speed);  //penalizing speed<max_speed
@@ -294,10 +295,11 @@ int main() {
 				else
 				{
 					double min_dist_rear = 10+check_speed*.447*react_time+fmax(0,-braking_dist); 
-					cost_dist_tmp=fmax(0,1+dist/min_dist_rear);
+					cost_dist_rear_tmp=fmax(0,1+dist/min_dist_rear);
 				}
 				
-				double cost_tmp=fmax(cost_dist_tmp,cost_speed_tmp);
+				double cost_front_tmp=fmax(cost_dist_front_tmp,cost_speed_tmp);
+				double cost_tmp=fmax(cost_dist_front_tmp,cost_front_tmp);
 			
 				
 				//trajectory cost
@@ -306,7 +308,7 @@ int main() {
 				{
 					if(cost_tmp>cost_traj[lane])
 					{
-						cost_traj[lane]=cost_tmp;
+						cost_traj[lane]=cost_front_tmp;
 						max_speed_new[lane]=max_speed_tmp;
 					}
 				}
@@ -344,7 +346,7 @@ int main() {
 			lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
 			
 			// assigning acceleration and speed
-			double cost_acc = fmax(-1,fmin(0,max_speed_new[lane]-vref))+fmax(0,1-vref/max_speed_new[lane]);
+			double cost_acc = fmax(-1,fmin(0,max_speed_new[lane]-car_speed))+fmax(0,1-car_speed/max_speed_new[lane]);
 			acc=cost_acc*max_acc;  
 			
 			// updating reference speed
