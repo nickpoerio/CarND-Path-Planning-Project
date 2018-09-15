@@ -252,7 +252,7 @@ int main() {
 			int prev_npts = previous_path_x.size();
 			
 			double react_time = 0.5;
-			double min_distance = 10+car_speed*.447*react_time+pow(car_speed*.447/30,2)*40); //minimum+reaction space+stopping distance
+			double min_distance = 10+car_speed*.447*react_time+pow(car_speed*.447/30,2)*40; //minimum+reaction space+stopping distance
 			double maneuver_distance=10+car_speed*.447;
 			
 			vector<double> cost{0.,0.,0.};
