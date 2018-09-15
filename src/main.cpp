@@ -255,6 +255,8 @@ int main() {
 			double maneuver_distance=10+car_speed*.447;
 			
 			vector<double> cost_traj{0.,0.,0.};
+			double cost_acc = 0;
+			double max_speed_new = max_speed;
 			
 			if(prev_npts>0)
 			{
@@ -297,18 +299,46 @@ int main() {
 				
 				double cost_tmp=fmax(cost_dist_tmp,cost_speed_tmp);
 			
+				
+				//trajectory cost
 			
 				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
 				{
-					cost_traj[lane]=fmax(cost_traj[lane],cost_tmp);
+					if(cost_tmp>cost_traj[lane])
+					{
+						cost_traj[lane]=cost_tmp;
+						max_speed_new=max_speed_tmp;
+					}
 				}
 				else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0))
-				{
-					cost_traj[lane-1]=fmax(0.05,fmax(cost_traj[lane-1],cost_tmp));
+				{					
+					if(cost_tmp>cost_traj[lane-1])
+					{
+						cost_traj[lane-1]=cost_tmp;
+						max_speed_new=max_speed_tmp;
+					}
+					cost_traj[lane-1]=fmax(0.05,cost_traj[lane-1]); //slightly penalizing lane change in any case
 				}
 				else if(d<(lane_width*(lane+2)) && d>(lane_width*(lane+1) && lane<2))
 				{
-					cost_traj[lane+1]=fmax(0.05,fmax(cost_traj[lane+1],cost_tmp));
+					if(cost_tmp>cost_traj[lane+1])
+					{
+						cost_traj[lane+1]=cost_tmp;
+						max_speed_new=max_speed_tmp;
+					}
+					cost_traj[lane+1]=fmax(0.05,cost_traj[lane+1]); //slightly penalizing lane change in any case
+				}
+				
+				// long. acceleration cost
+			
+			
+				if(dist>0 && dist< min_dist_front)
+				{
+					double cost_acc = fmax(-1,fmin(0,max_speed_tmp-vref));
+				}
+				else if(dist<=0 && dist>min_dist_rear)
+				{
+					double cost_acc = fmax(0,1-vref/max_speed_tmp);
 				}
 			}
 			
@@ -324,20 +354,8 @@ int main() {
 			
 			// choosing lane
 			lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
-		
-			// deciding longitudinal action
 			
-			double cost_acc = 0;
-			
-			if(dist>0 && dist< min_dist_front)
-			{
-				double cost_acc = fmax(-1,fmin(0,max_speed_tmp-vref));
-			}
-			else if(dist<=0 && dist>min_dist_rear)
-			{
-				double cost_acc = fmax(0,1-vref/max_speed_tmp);
-			}
-			
+			// assigning acceleration and speed
 			acc=cost_acc*max_acc;  
 						
 			vref+=acc;
