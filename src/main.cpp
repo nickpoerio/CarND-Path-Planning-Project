@@ -251,8 +251,8 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double react_time = 0.5;
-			double min_distance = 10+car_speed*.447*react_time+pow(car_speed*.447/30,2)*40; //minimum+reaction space+stopping distance
+			double react_time = 0.8;
+			double min_distance = 10+car_speed*.447*react_time; //minimum+reaction space+stopping distance
 			double maneuver_distance=10+car_speed*.447;
 			
 			vector<double> cost{0.,0.,0.};
@@ -275,24 +275,25 @@ int main() {
 				check_car_s += ((double)prev_npts*.02*check_speed);
 				double estim_dist = fmax(0,check_car_s-car_s);
 				double estim_dist_rear = -fmin(0,check_car_s-car_s);
+				min_distance+=(car_speed-check_speed)
 				double min_distance_rear = 15+check_speed*.447*react_time; // separare contributi front e rear, rear solo per cambio corsia
 				double cost_tmp = fmax(0,1-(estim_dist)/min_distance);
 				double cost_tmp_rear = fmax(0,1-(estim_dist_rear)/min_distance_rear);
 			
 				if(d<(lane_width*(1+lane)) && d>(lane_width*lane))
 				{
-					cost[lane]=cost_tmp;
-					cost_traj[lane]=cost_tmp;
+					cost[lane]=fmax(cost[lane],cost_tmp);
+					cost_traj[lane]=cost[lane];
 				}
 				else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0))
 				{
-					cost[lane-1]=cost_tmp;
-					cost_traj[lane-1]=fmax(cost_tmp,cost_tmp_rear)+.05;
+					cost[lane-1]=fmax(cost[lane-1],cost_tmp);
+					cost_traj[lane-1]=fmax(cost[lane-1],cost_tmp_rear)+.05;
 				}
 				else if(d<(lane_width*(lane+2)) && d>(lane_width*(lane+1) && lane<2))
 				{
-					cost[lane+1]=cost_tmp;
-					cost_traj[lane+1]=fmax(cost_tmp,cost_tmp_rear)+.05;
+					cost[lane+1]=fmax(cost[lane+1],cost_tmp);;
+					cost_traj[lane+1]=fmax(cost[lane+1],cost_tmp_rear)+.05;
 				}
 			}
 			
@@ -311,7 +312,7 @@ int main() {
 		
 			// deciding longitudinal action
 			
-			acc=fmin(max_acc,fmax(-max_acc,sqrt(fmax(0,(max_speed-vref)))/20-cost[lane]*max_acc-fmax(0,(vref-max_speed))*max_acc));  //non-linear function of cost and speed
+			acc=fmin(max_acc,fmax(-max_acc,fmax(0,(max_speed-vref))/max_speed*max_acc-cost[lane]*max_acc*2-fmax(0,(vref-max_speed))*max_acc));  //non-linear function of cost and speed
 						
 			vref+=acc;
 			
@@ -390,7 +391,7 @@ int main() {
 				next_y_vals.push_back(previous_path_y[i]);
 			}	
 			
-			double target_x = 30;
+			double target_x = maneuver_distance;
 			double target_y = s(target_x);
 			double target_dist = sqrt(target_x*target_x+target_y*target_y);
 			
