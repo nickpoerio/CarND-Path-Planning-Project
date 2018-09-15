@@ -275,7 +275,7 @@ int main() {
 				check_car_s += ((double)prev_npts*.02*check_speed);
 				double dist=check_car_s-car_s;
 				double delta_speed = check_speed-car_speed;
-				double braking_dist = (pow(car_speed,2)-pow(check_speed,2))/max_acc;
+				double braking_dist = (pow(car_speed*.447,2)-pow(check_speed*.447,2))/.5;
 				
 				double cost_dist_tmp = 0;
 				double cost_speed_tmp = 0;
