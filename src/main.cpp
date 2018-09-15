@@ -311,7 +311,7 @@ int main() {
 		
 			// deciding longitudinal action
 			
-			acc=fmin(max_acc,fmax(-max_acc,sqrt(fmax(0,(max_speed-vref)))/20-cost[lane]-fmax(0,(vref-max_speed))/10));  //non-linear function of cost and speed
+			acc=fmin(max_acc,fmax(-max_acc,sqrt(fmax(0,(max_speed-vref)))/20-cost[lane]*max_acc-fmax(0,(vref-max_speed))*max_acc));  //non-linear function of cost and speed
 						
 			vref+=acc;
 			
