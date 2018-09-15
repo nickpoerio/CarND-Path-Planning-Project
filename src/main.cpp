@@ -255,8 +255,8 @@ int main() {
 			double maneuver_distance=10+car_speed*.447;
 			
 			vector<double> cost_traj{0.,0.,0.};
-			double cost_acc = 0;
 			double max_speed_new = max_speed;
+			
 			
 			if(prev_npts>0)
 			{
@@ -307,7 +307,7 @@ int main() {
 					if(cost_tmp>cost_traj[lane])
 					{
 						cost_traj[lane]=cost_tmp;
-						max_speed_new=max_speed_tmp;
+						max_speed_new = max_speed_tmp;
 					}
 				}
 				else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0))
@@ -315,7 +315,7 @@ int main() {
 					if(cost_tmp>cost_traj[lane-1])
 					{
 						cost_traj[lane-1]=cost_tmp;
-						max_speed_new=max_speed_tmp;
+						max_speed_new = max_speed_tmp;
 					}
 					cost_traj[lane-1]=fmax(0.05,cost_traj[lane-1]); //slightly penalizing lane change in any case
 				}
@@ -324,18 +324,13 @@ int main() {
 					if(cost_tmp>cost_traj[lane+1])
 					{
 						cost_traj[lane+1]=cost_tmp;
-						max_speed_new=max_speed_tmp;
+						max_speed_new = max_speed_tmp;
 					}
 					cost_traj[lane+1]=fmax(0.05,cost_traj[lane+1]); //slightly penalizing lane change in any case
 				}
-				
-				// long. acceleration cost
-			
-				double cost_acc = fmax(-1,fmin(0,max_speed_new-vref))+fmax(0,1-vref/max_speed_new);
-	
 			}
 			
-			// excluding too far lane
+			// excluding too far lanes
 			if(lane==0)
 			{
 				cost_traj[2]=1.;
@@ -349,8 +344,10 @@ int main() {
 			lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
 			
 			// assigning acceleration and speed
+			double cost_acc = fmax(-1,fmin(0,max_speed_new-vref))+fmax(0,1-vref/max_speed_new);
 			acc=cost_acc*max_acc;  
-						
+			
+			// updating reference speed
 			vref+=acc;
 			
 			
