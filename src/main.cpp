@@ -286,12 +286,12 @@ int main() {
 				}
 				else if(d<(lane_width*lane) && d>(lane_width*(lane-1) && lane>0))
 				{
-					cost[lane]=cost_tmp;
+					cost[lane-1]=cost_tmp;
 					cost_traj[lane-1]=fmax(cost_tmp,cost_tmp_rear)+.05;
 				}
 				else if(d<(lane_width*(lane+2)) && d>(lane_width*(lane+1) && lane<2))
 				{
-					cost[lane]=cost_tmp;
+					cost[lane+1]=cost_tmp;
 					cost_traj[lane+1]=fmax(cost_tmp,cost_tmp_rear)+.05;
 				}
 			}
