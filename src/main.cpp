@@ -252,9 +252,9 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double maneuver_distance=10+car_speed*.447;
+			double maneuver_distance=fmin(10,car_speed*.447*1.5);
 			
-			vector<double> cost_traj{.02,.01,0.}; //slightly penalizing the left lanes
+			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
 			vector<double> max_speed_new = {max_speed,max_speed,max_speed};
 			
 			
@@ -275,7 +275,7 @@ int main() {
 				check_car_s += ((double)prev_npts*.02*check_speed);
 				double dist=check_car_s-car_s;
 				double delta_speed = check_speed-car_speed;
-				double braking_dist = (pow(car_speed*.447,2)-pow(check_speed*.447,2))/(2*5);
+				double braking_dist = (pow(car_speed*.447,2)-pow(check_speed*.447,2))/(2*5); //5 m/s^2 = max braking acceleration
 				
 				double cost_dist_front_tmp = 0;
 				double cost_dist_rear_tmp = 0;
@@ -348,7 +348,7 @@ int main() {
 			lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
 			
 			// assigning acceleration and speed
-			double cost_acc = fmax(-1,fmin(0,max_speed_new[lane]-car_speed))+sqrt(fmax(0,1-car_speed/max_speed_new[lane]));
+			double cost_acc = -sqrt(fmax(1,fmin(0,car_speed-max_speed_new[lane])))+sqrt(fmax(0,1-car_speed/max_speed_new[lane]));
 			acc=cost_acc*max_acc;  
 			
 			// updating reference speed
