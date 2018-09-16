@@ -284,7 +284,7 @@ int main() {
 				
 				if(dist>0)
 				{
-					double min_dist_front = 10+car_speed*.447*react_time+fmax(0,braking_dist); //minimum+reaction space+braking distance
+					double min_dist_front = fmax(10,car_speed*.447*react_time+fmax(0,braking_dist)); //minimum+reaction space+braking distance
 					cost_dist_front_tmp = fmax(0,1-dist/min_dist_front);
 					if(dist<min_dist_front)
 					{
@@ -294,11 +294,11 @@ int main() {
 				}
 				else
 				{
-					double min_dist_rear = 10+check_speed*.447*react_time+fmax(0,-braking_dist); 
+					double min_dist_rear = fmax(10+check_speed*.447*react_time+fmax(0,-braking_dist)); 
 					cost_dist_rear_tmp=fmax(0,1+dist/min_dist_rear);
 					if(abs(dist)<min_dist_rear)
 					{
-						cost_speed_tmp = fmin(1,fmax(0,(check_speed-car_speed)/10))*.3;  //penalizing speed<<check_speed
+						cost_speed_tmp = fmin(1,fmax(0,(check_speed-car_speed)/10));  //penalizing speed<<check_speed
 					}
 				}
 				
