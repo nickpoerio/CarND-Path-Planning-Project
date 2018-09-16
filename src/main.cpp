@@ -277,15 +277,14 @@ int main() {
 				double delta_speed = check_speed-car_speed;
 				double braking_dist = (pow(car_speed*.447,2)-pow(check_speed*.447,2))/(2*5); //5 m/s^2 = max braking acceleration
 				
-				double cost_dist_front_tmp = 0;
-				double cost_dist_rear_tmp = 0;
+				double cost_dist_tmp = 0;
 				double cost_speed_tmp = 0;
 				double max_speed_tmp = max_speed;
 				
 				if(dist>0)
 				{
 					double min_dist_front = fmax(10,car_speed*.447*react_time+fmax(0,braking_dist)); //minimum+reaction space+braking distance
-					cost_dist_front_tmp = fmax(0,1-dist/min_dist_front);
+					cost_dist_tmp = fmax(0,1-dist/min_dist_front);
 					if(dist<min_dist_front)
 					{
 						cost_speed_tmp = fmax(0,1-check_speed/max_speed);  //penalizing speed<max_speed
@@ -295,15 +294,14 @@ int main() {
 				else
 				{
 					double min_dist_rear = fmax(10,check_speed*.447*react_time+fmax(0,-braking_dist)); 
-					cost_dist_rear_tmp=fmax(0,1+dist/min_dist_rear);
+					cost_dist_tmp=fmax(0,1+dist/min_dist_rear);
 					if(abs(dist)<min_dist_rear)
 					{
 						cost_speed_tmp = fmin(1,fmax(0,(check_speed-car_speed)/10));  //penalizing speed<<check_speed
 					}
 				}
 				
-				double cost_front_tmp=fmax(cost_dist_front_tmp,cost_speed_tmp);
-				double cost_tmp=fmax(cost_dist_rear_tmp,cost_front_tmp);
+				double cost_tmp=fmax(cost_dist_tmp,cost_speed_tmp);
 			
 				
 				//trajectory cost
@@ -312,7 +310,7 @@ int main() {
 				{
 					if(cost_tmp>cost_traj[lane])
 					{
-						cost_traj[lane]=cost_front_tmp;
+						cost_traj[lane]=cost_tmp;
 						max_speed_new[lane]=max_speed_tmp;
 					}
 				}
