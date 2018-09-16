@@ -343,7 +343,12 @@ int main() {
 			}
 			
 			// choosing lane
-			int lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
+			lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
+			int actual_lane = floor(car_d/lane_width);
+			if(abs(actual_lane-lane)==2)
+			{
+				lane = 1; //don't look too far!
+			}
 			double target_speed = max_speed_new[lane];
 			
 			// assigning acceleration and speed
