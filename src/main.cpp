@@ -252,7 +252,7 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double maneuver_distance=fmax(10,car_speed*.447*1.9); // empirically set
+			double maneuver_distance=fmax(10,car_speed*.447*1.75); // empirically set
 			
 			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
 			vector<double> max_speed_new = {max_speed,max_speed,max_speed};
