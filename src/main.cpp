@@ -252,7 +252,7 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double maneuver_distance=fmin(10,car_speed*.447*1.5);
+			double maneuver_distance=fmax(10,car_speed*.447*1.5);
 			
 			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
 			vector<double> max_speed_new = {max_speed,max_speed,max_speed};
@@ -298,7 +298,7 @@ int main() {
 					cost_dist_rear_tmp=fmax(0,1+dist/min_dist_rear);
 					if(abs(dist)<min_dist_rear)
 					{
-						cost_speed_tmp = fmin(1,fmax(0,(check_speed-car_speed)/10))*.3;  //penalizing speed<<check_speed
+						cost_speed_tmp = fmin(1,fmax(0,(check_speed-car_speed)/10));  //penalizing speed<<check_speed
 					}
 				}
 				
