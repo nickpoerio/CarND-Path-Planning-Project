@@ -289,7 +289,7 @@ int main() {
 					if(dist<min_dist_front)
 					{
 						cost_speed_tmp = fmax(0,1-check_speed/max_speed);  //penalizing speed<max_speed
-						max_speed_tmp = check_speed;
+						max_speed_tmp = fmin(max_speed,check_speed);
 					}
 				}
 				else
