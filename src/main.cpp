@@ -252,7 +252,7 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double lane = car_d%lane_width;
+			int lane = car_d%lane_width;
 			double maneuver_distance=fmax(10,car_speed*.447*1.9); // empirically set
 			
 			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
@@ -344,7 +344,7 @@ int main() {
 			}
 			
 			// choosing lane
-			double target_lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
+			int target_lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
 			double target_speed = fmin(max_speed_new[lane],max_speed_new[target_lane]);
 			
 			// assigning acceleration and speed
