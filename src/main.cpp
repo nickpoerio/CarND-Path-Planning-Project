@@ -343,10 +343,12 @@ int main() {
 			}
 			
 			// choosing lane
-			lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
+			double lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
+			double actual_lane = d%lane_width;
+			double target_speed = fmin(max_speed_new[lane],max_speed_new[actual_lane]);
 			
 			// assigning acceleration and speed
-			double cost_acc = -2*fmin(.5,fmax(0,car_speed-max_speed_new[lane]))+fmax(0,1-car_speed/max_speed_new[lane]);
+			double cost_acc = -2*fmin(.5,fmax(0,car_speed-target_speed))+fmax(0,1-car_speed/target_speed);
 			acc=cost_acc*max_acc;  
 			
 			// updating reference speed
