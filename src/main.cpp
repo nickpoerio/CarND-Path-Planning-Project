@@ -294,7 +294,7 @@ int main() {
 				}
 				else
 				{
-					double min_dist_rear = fmax(10+check_speed*.447*react_time+fmax(0,-braking_dist)); 
+					double min_dist_rear = fmax(10,check_speed*.447*react_time+fmax(0,-braking_dist)); 
 					cost_dist_rear_tmp=fmax(0,1+dist/min_dist_rear);
 					if(abs(dist)<min_dist_rear)
 					{
