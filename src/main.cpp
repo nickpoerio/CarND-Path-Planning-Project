@@ -208,7 +208,7 @@ int main() {
   double vref = 0.; // mph, initialization
   double acc = 0.; // mph/s, initialization
   double max_acc=.224; //mph/s
-  double max_speed=49; //mph
+  double max_speed=49.5; //mph
   double react_time = 0.5; //s
   
   h.onMessage([&lane,&lane_width,&vref,&acc,&max_acc,&max_speed,&react_time,&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
@@ -252,7 +252,7 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double maneuver_distance=fmax(10,car_speed*.447*2); // empirically set
+			double maneuver_distance=fmax(10,car_speed*.447*1.9); // empirically set
 			
 			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
 			vector<double> max_speed_new = {max_speed,max_speed,max_speed};
@@ -348,7 +348,7 @@ int main() {
 			lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
 			
 			// assigning acceleration and speed
-			double cost_acc = -fmin(1,fmax(0,car_speed-max_speed_new[lane]))+fmax(0,1-car_speed/max_speed_new[lane]);
+			double cost_acc = -2*fmin(.5,fmax(0,car_speed-max_speed_new[lane]))+fmax(0,1-car_speed/max_speed_new[lane]);
 			acc=cost_acc*max_acc;  
 			
 			// updating reference speed
