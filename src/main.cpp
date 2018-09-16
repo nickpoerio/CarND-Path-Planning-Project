@@ -252,6 +252,7 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
+			double lane = car_d%lane_width;
 			double maneuver_distance=fmax(10,car_speed*.447*1.9); // empirically set
 			
 			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
@@ -343,9 +344,8 @@ int main() {
 			}
 			
 			// choosing lane
-			double lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
-			double actual_lane = d%lane_width;
-			double target_speed = fmin(max_speed_new[lane],max_speed_new[actual_lane]);
+			double target_lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
+			double target_speed = fmin(max_speed_new[lane],max_speed_new[target_lane]);
 			
 			// assigning acceleration and speed
 			double cost_acc = -2*fmin(.5,fmax(0,car_speed-target_speed))+fmax(0,1-car_speed/target_speed);
@@ -393,9 +393,9 @@ int main() {
 				
 			}
 			
-			vector<double> wp0 = getXY(car_s+maneuver_distance, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp1 = getXY(car_s+maneuver_distance*2, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-			vector<double> wp2 = getXY(car_s+maneuver_distance*3, (lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp0 = getXY(car_s+maneuver_distance, (target_lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp1 = getXY(car_s+maneuver_distance*2, (target_lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+			vector<double> wp2 = getXY(car_s+maneuver_distance*3, (target_lane+0.5)*lane_width, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 		
 			ptsx.push_back(wp0[0]);
 			ptsx.push_back(wp1[0]);
