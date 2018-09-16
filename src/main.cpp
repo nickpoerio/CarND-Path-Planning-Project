@@ -344,8 +344,7 @@ int main() {
 			
 			// choosing lane
 			int lane = std::distance(cost_traj.begin(),std::min_element( cost_traj.begin(), cost_traj.end() ));  //argmin
-			int actual_lane = floor(car_d/lane_width);
-			double target_speed = fmin(max_speed_new[lane],max_speed_new[actual_lane]);
+			double target_speed = max_speed_new[lane];
 			
 			// assigning acceleration and speed
 			double cost_acc = -2*fmin(.5,fmax(0,car_speed-target_speed))+fmax(0,1-car_speed/target_speed);
