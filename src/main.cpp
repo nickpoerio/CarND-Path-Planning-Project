@@ -298,7 +298,7 @@ int main() {
 					cost_dist_rear_tmp=fmax(0,1+dist/min_dist_rear);
 					if(abs(dist)<min_dist_rear)
 					{
-						cost_speed_tmp = fmin(1,fmax(0,(check_speed-car_speed)/10));  //penalizing speed<<check_speed
+						cost_speed_tmp = fmin(1,fmax(0,(check_speed-car_speed)/10))*.3;  //penalizing speed<<check_speed
 					}
 				}
 				
