@@ -252,7 +252,7 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			double maneuver_distance=fmax(10,car_speed*.447*1.75); // empirically set
+			double maneuver_distance=fmax(15,car_speed*.447*1.75); // empirically set
 			
 			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
 			vector<double> max_speed_new = {max_speed,max_speed,max_speed};
@@ -283,7 +283,7 @@ int main() {
 				
 				if(dist>0)
 				{
-					double min_dist_front = fmax(10,car_speed*.447*react_time+fmax(0,braking_dist)); //minimum+reaction space+braking distance
+					double min_dist_front = fmax(15,car_speed*.447*react_time+fmax(0,braking_dist)); //minimum+reaction space+braking distance
 					cost_dist_tmp = fmax(0,1-dist/min_dist_front);
 					if(dist<min_dist_front)
 					{
@@ -293,7 +293,7 @@ int main() {
 				}
 				else
 				{
-					double min_dist_rear = fmax(10,check_speed*.447*react_time+fmax(0,-braking_dist)); 
+					double min_dist_rear = fmax(15,check_speed*.447*react_time+fmax(0,-braking_dist)); 
 					cost_dist_tmp=fmax(0,1+dist/min_dist_rear);
 					if(abs(dist)<min_dist_rear)
 					{
