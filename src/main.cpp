@@ -252,7 +252,7 @@ int main() {
 						
 			int prev_npts = previous_path_x.size();
 			
-			int lane = car_d%lane_width;
+			int lane = floor(car_d/lane_width);
 			double maneuver_distance=fmax(10,car_speed*.447*1.9); // empirically set
 			
 			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
