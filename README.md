@@ -1,5 +1,42 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
+
+### Compilation and valid trajectories
+The project compiles and runs correctly and valid trajectories are generated during the course (> 6 miles), meeting all the specifications
+
+### Model description
+The path planning pipeline is described below:
+
+- cost evaluation for lane selection
+- lane selection
+- longitudinal acceleration planning
+- trajectory generation
+
+#### Cost evaluation for lane selection
+This is the most complex part. Two types of cost are calculated:
+
+- longitudinal distance cost
+- speed cost
+
+A minimum distance variable is calculated on the base of the reaction time (set to 0.5s) and the braking distance, depending on the speed difference to the next vehicle and the maximum deceleration achievable (0.5g). A minimum distance of 15 m is forced.
+
+The longitudinal distance cost (0-1) is calulated when vehicles are closer then the minimum distance. A square root function is used, in order to have a steeper variation of the cost when the distance is small (more dangerous situations).
+The speed cost (0-1) is also calculated during this condition: a linear function is used, penalizing speeds < maximum_speed for slower forthcoming vehicles and speeds > current speed for the upcoming vehicles.
+The code of this part can be found on lines 276-304.
+
+#### Lane selection
+The maximum cost between distance and speed based ones is assigned to the lane, if no greater cost is already assigned. The side lanes are slightly penalized through a small bias (1e-5), so that in case of no traffic, the central lane is picked and the highest road availability is reached for a possible future move (right or left). This is possible for U.S. traffic, in Europe it would be different.
+The lane is then selected on the base of the minimum cost between the three lanes.
+It is possible that two consecutive lane changes are planned by chance through this logic: the planner is then forced to make one-by-one step decision. Lane change is set not to be possible for speed < 15 mph.
+The code of this part can be found on lines 307-371.
+
+#### Longitudinal acceleration planning
+The longitudinal decision process is driven by the difference with respect to the target speed, which is updated from the nominal maximum speed in case of presence of slower forthcoming vehicles. The acceleration gain is much bigger during deceleration, due to the narrower speed margin available. The maximum acceleration/deceleration is set to be smaller then 0.5 g.
+
+#### Trajectory generation
+The trajectory is generated using cubic splines interpolating over three points,spaced along with a 'maneuver distance' criterium. This distance is set empirically dependent from the speed, in order to avoid excess lateral accelerations and jerk.
+The s points sampling has been made using even spacing on the start-end segment. The uneveness of the spline sampling is thus very limited.
+A quintic spline would be more appropriate, as jerk optimal, but for this problem the cubic one makes the job done.
    
 ### Simulator.
 You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).
