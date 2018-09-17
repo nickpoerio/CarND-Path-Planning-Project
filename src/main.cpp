@@ -351,7 +351,7 @@ int main() {
 			}
 			else if(car_speed<15)
 			{
-				lane = actual lane; //keep lane if too slow
+				lane = actual_lane; //keep lane if too slow
 			}
 			double target_speed = max_speed_new[lane];
 			
