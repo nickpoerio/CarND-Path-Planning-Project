@@ -254,7 +254,7 @@ int main() {
 			
 			double maneuver_distance=fmax(15,car_speed*.447*1.75); // empirically set
 			
-			vector<double> cost_traj{.001,0.,0.001}; //slightly penalizing side lanes
+			vector<double> cost_traj{1e-5,0.,1e-5}; //slightly penalizing side lanes
 			vector<double> max_speed_new = {max_speed,max_speed,max_speed};
 			
 			
@@ -284,7 +284,7 @@ int main() {
 				if(dist>0)
 				{
 					double min_dist_front = fmax(15,car_speed*.447*react_time+fmax(0,braking_dist)); //minimum+reaction space+braking distance
-					cost_dist_tmp = fmax(0,1-dist/min_dist_front);
+					cost_dist_tmp = sqrt(fmax(0,1-dist/min_dist_front));
 					if(dist<min_dist_front)
 					{
 						cost_speed_tmp = fmax(0,1-check_speed/max_speed);  //penalizing speed<max_speed
@@ -294,7 +294,7 @@ int main() {
 				else
 				{
 					double min_dist_rear = fmax(15,check_speed*.447*react_time+fmax(0,-braking_dist)); 
-					cost_dist_tmp=fmax(0,1+dist/min_dist_rear);
+					cost_dist_tmp=sqrt(fmax(0,1+dist/min_dist_rear));
 					if(abs(dist)<min_dist_rear)
 					{
 						cost_speed_tmp = fmin(1,fmax(0,(check_speed-car_speed)/10));  //penalizing speed<<check_speed
