@@ -254,7 +254,7 @@ int main() {
 			
 			double maneuver_distance=fmax(15,car_speed*.447*1.75); // empirically set
 			
-			vector<double> cost_traj{.002,.001,0.}; //slightly penalizing the left lanes
+			vector<double> cost_traj{.001,0.,0.001}; //slightly penalizing side lanes
 			vector<double> max_speed_new = {max_speed,max_speed,max_speed};
 			
 			
@@ -348,6 +348,10 @@ int main() {
 			if(abs(actual_lane-lane)==2)
 			{
 				lane = 1; //don't look too far!
+			}
+			else if(car_speed<15)
+			{
+				lane = actual lane; //keep lane if too slow
 			}
 			double target_speed = max_speed_new[lane];
 			
